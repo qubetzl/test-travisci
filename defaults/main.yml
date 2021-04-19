@@ -1,0 +1,8 @@
+---
+docker_repo_url: https://download.docker.com/linux
+docker_apt_gpg_key: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+docker_apt_gpg_key_checksum: sha256:1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570
+# docker_apt_gpg_key_checksum: >
+#   sha512:d07607e3119181026e3309fb828882a13621960c54290416c2f897e1834f36abdb48d11b6f71aba1d2b9e7dac3f3fe8281c248500cfe13705674a5446826b699
+docker_apt_gpg_key_dst: /usr/share/keyrings/docker-archive-keyring.gpg
+docker_apt_gpg_key_tmp_dst: /tmp/docker_gpg_key

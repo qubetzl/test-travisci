@@ -1,0 +1,41 @@
+---
+- name: Ensure old Docker engine is not installed.
+  package:
+    name: "{{ item }}"
+    state: "absent"
+  with_items:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
+
+- name: Make sure Docker signing key is installed.
+  get_url:
+    url: "{{ docker_apt_gpg_key }}"
+    checksum: "{{ docker_apt_gpg_key_checksum }}"
+    dest: "{{ docker_apt_gpg_key_tmp_dst }}"
+  register: gpg_key_download
+
+- name: Make sure newly downloaded signing key is installed.
+  command: "gpg --dearmor -o {{ docker_apt_gpg_key_dst }} {{ docker_apt_gpg_key_tmp_dst }}"
+  when: gpg_key_download is changed  # noqa no-handler
+
+- name: Ensure Docker repository is present.
+  apt_repository:
+    repo: "deb [signed-by {{ docker_apt_gpg_key_dst }}] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+    update_cache: true
+
+- name: Ensure Docker is installed.
+  package:
+    name: docker-ce
+    state: present
+  notify: restart_docker
+
+- name: Ensure Docker is started now and at boot.
+  service:
+    name: docker
+    state: started
+    enabled: true
