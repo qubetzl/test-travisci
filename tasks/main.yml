@@ -10,12 +10,20 @@
     - containerd
     - runc
 
+- name: "Debugging 1"
+  debug:
+    msg: "Printing variables {{ docker_apt_gpg_key }};{{ docker_apt_gpg_key_checksum }};{{ docker_apt_gpg_key_dst }};{{ docker_apt_gpg_key_tmp_dst }};{{ ansible_user_id }}"
+
 - name: Make sure Docker signing key is installed.
   get_url:
     url: "{{ docker_apt_gpg_key }}"
     checksum: "{{ docker_apt_gpg_key_checksum }}"
     dest: "{{ docker_apt_gpg_key_tmp_dst }}"
   register: gpg_key_download
+
+- name: "Debugging 2"
+  debug:
+    var: gpg_key_download
 
 - name: Make sure newly downloaded signing key is installed.
   command: "gpg --dearmor -o {{ docker_apt_gpg_key_dst }} {{ docker_apt_gpg_key_tmp_dst }}"
